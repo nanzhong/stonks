@@ -46,7 +46,7 @@ func main() {
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGSTOP)
 
 	<-done
-	log.Printf("Got signal: %d", done)
+	log.Printf("Got signal: %s", done)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
