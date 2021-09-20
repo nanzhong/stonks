@@ -132,6 +132,9 @@ func (h *eventHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 
+			blocks, _ := json.MarshalIndent(messageBlocks, "", "  ")
+			log.Println(string(blocks))
+
 			_, _, err = h.slackClient.PostMessageContext(
 				r.Context(),
 				appMentionEvent.Channel,
