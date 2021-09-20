@@ -22,7 +22,7 @@ var (
 )
 
 func main() {
-	flag.StringVar(&addr, "addr", envOrString("ADDR", "0.0.0.0"), "Address to listen on.")
+	flag.StringVar(&addr, "addr", envOrString("ADDR", "0.0.0.0:8080"), "Address to listen on.")
 	flag.StringVar(&slackBotToken, "slack-bot-token", envOrString("SLACK_BOT_TOKEN", ""), "Slack token to use.")
 	flag.StringVar(&slackSigningSecret, "slack-signing-secret", envOrString("SLACK_SIGNING_SECRET", ""), "Slack signing secret for requests events.")
 
