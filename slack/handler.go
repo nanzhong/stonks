@@ -106,7 +106,13 @@ func (h *eventHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if len(quotes) == 0 {
-			_, _, err = h.slackClient.PostMessageContext(r.Context(), appMentionEvent.Channel, slack.MsgOptionText("Sorry, I didn't find any valid market symbols in your message. :cry:", false))
+			_, _, err = h.slackClient.PostMessageContext(
+				r.Context(),
+				appMentionEvent.Channel,
+				slack.MsgOptionText("Sorry, I didn't find any valid market symbols in your message. :cry:", false),
+				slack.MsgOptionTS(appMentionEvent.TimeStamp),
+				slack.MsgOptionBroadcast(),
+			)
 		} else {
 			messageBlocks := []slack.Block{
 				slack.NewTextBlockObject(slack.MarkdownType, "Found the following quotes :chart_with_upward_trend:", true, false),
@@ -115,18 +121,33 @@ func (h *eventHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				messageBlocks = append(messageBlocks,
 					slack.NewHeaderBlock(
 						slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("*%s (%s)*", quote.ShortName, quote.Symbol), false, false)),
-					slack.NewSectionBlock(slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("*%.2f %+.2f (%+.2f%s)*", quote.RegularMarketPrice, quote.RegularMarketChange, quote.RegularMarketChangePercent, url.QueryEscape("%")), false, false), nil, nil),
+					slack.NewSectionBlock(
+						slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("*%.2f %+.2f (%+.2f%s)*", quote.RegularMarketPrice, quote.RegularMarketChange, quote.RegularMarketChangePercent, url.QueryEscape("%")), false, false),
+						nil,
+						nil,
+					),
 				)
 				if i != len(quotes)-1 {
 					messageBlocks = append(messageBlocks, slack.NewDividerBlock())
 				}
 			}
 
-			_, _, err = h.slackClient.PostMessageContext(r.Context(), appMentionEvent.Channel, slack.MsgOptionBlocks(messageBlocks...))
+			_, _, err = h.slackClient.PostMessageContext(
+				r.Context(),
+				appMentionEvent.Channel,
+				slack.MsgOptionBlocks(messageBlocks...),
+				slack.MsgOptionTS(appMentionEvent.TimeStamp),
+				slack.MsgOptionBroadcast(),
+			)
 		}
 		if err != nil {
 			// Best effort attempt to send a message indicating failure
-			_, _, _ = h.slackClient.PostMessageContext(r.Context(), appMentionEvent.Channel, slack.MsgOptionText("Sorry, I messed something up... Try again later :poop:", true))
+			_, _, _ = h.slackClient.PostMessageContext(
+				r.Context(),
+				appMentionEvent.Channel, slack.MsgOptionText("Sorry, I messed something up... Try again later :poop:", true),
+				slack.MsgOptionTS(appMentionEvent.TimeStamp),
+				slack.MsgOptionBroadcast(),
+			)
 			h.respondWithErr(w, r, newHTTPErrorWithMessage(err, "responding to mention", http.StatusInternalServerError))
 			return
 		}
