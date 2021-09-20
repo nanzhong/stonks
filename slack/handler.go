@@ -123,12 +123,10 @@ func (h *eventHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 
 			_, _, err = h.slackClient.PostMessageContext(r.Context(), appMentionEvent.Channel, slack.MsgOptionBlocks(messageBlocks...))
-			if err != nil {
-				h.respondWithErr(w, r, newHTTPErrorWithMessage(err, "responding with quotes", http.StatusInternalServerError))
-				return
-			}
 		}
 		if err != nil {
+			// Best effort attempt to send a message indicating failure
+			_, _, _ = h.slackClient.PostMessageContext(r.Context(), appMentionEvent.Channel, slack.MsgOptionText("Sorry, I messed something up... Try again later :poop:", true))
 			h.respondWithErr(w, r, newHTTPErrorWithMessage(err, "responding to mention", http.StatusInternalServerError))
 			return
 		}
