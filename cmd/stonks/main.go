@@ -26,7 +26,11 @@ func main() {
 	flag.StringVar(&slackBotToken, "slack-bot-token", envOrString("SLACK_BOT_TOKEN", ""), "Slack token to use.")
 	flag.StringVar(&slackSigningSecret, "slack-signing-secret", envOrString("SLACK_SIGNING_SECRET", ""), "Slack signing secret for requests events.")
 
-	slackEventHandler := slack.NewEventHandler(slackgo.New(slackBotToken), slackSigningSecret, market.NewYahooBackend())
+	slackEventHandler := slack.NewEventHandler(
+		slackgo.New(slackBotToken, slackgo.OptionDebug(true)),
+		slackSigningSecret,
+		market.NewYahooBackend(),
+	)
 	mux := http.NewServeMux()
 	mux.Handle("/slack/event", slackEventHandler)
 
