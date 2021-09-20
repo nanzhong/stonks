@@ -115,12 +115,16 @@ func (h *eventHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			)
 		} else {
 			messageBlocks := []slack.Block{
-				slack.NewTextBlockObject(slack.MarkdownType, "Found the following quotes :chart_with_upward_trend:", true, false),
+				slack.NewSectionBlock(
+					slack.NewTextBlockObject(slack.MarkdownType, "Found the following quotes :chart_with_upward_trend:", false, false),
+					nil,
+					nil,
+				),
 			}
 			for i, quote := range quotes {
 				messageBlocks = append(messageBlocks,
 					slack.NewHeaderBlock(
-						slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("*%s (%s)*", quote.ShortName, quote.Symbol), false, false)),
+						slack.NewTextBlockObject(slack.PlainTextType, fmt.Sprintf("*%s (%s)*", quote.ShortName, quote.Symbol), false, false)),
 					slack.NewSectionBlock(
 						slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("*%.2f %+.2f (%+.2f%s)*", quote.RegularMarketPrice, quote.RegularMarketChange, quote.RegularMarketChangePercent, url.QueryEscape("%")), false, false),
 						nil,
