@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"regexp"
 	"strings"
@@ -126,7 +125,12 @@ func (h *eventHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					slack.NewHeaderBlock(
 						slack.NewTextBlockObject(slack.PlainTextType, fmt.Sprintf("%s (%s)", quote.ShortName, quote.Symbol), false, false)),
 					slack.NewSectionBlock(
-						slack.NewTextBlockObject(slack.MarkdownType, url.QueryEscape(fmt.Sprintf("*%.2f %+.2f (%+.2f%%)*", quote.RegularMarketPrice, quote.RegularMarketChange, quote.RegularMarketChangePercent)), false, true),
+						// NOTE the % sign at the end here is actually a small width percent
+						// sign. This is a janky workaround the slacktest server used in
+						// unit tests having an issue with url unescaping the form encoded
+						// request body.
+						// TODO the proper fix would be to fix the slacktest server.
+						slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("*%.2f %+.2f (%+.2f﹪)*", quote.RegularMarketPrice, quote.RegularMarketChange, quote.RegularMarketChangePercent), false, true),
 						nil,
 						nil,
 					),
