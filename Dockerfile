@@ -1,7 +1,7 @@
 FROM golang:1.17.1 AS build
 WORKDIR /workspace
 COPY . /workspace
-RUN go build -o ./dist/stonks ./cmd/stonks
+RUN go build -mod vendor -o ./dist/stonks ./cmd/stonks
 
 FROM golang:1.17.1
 
